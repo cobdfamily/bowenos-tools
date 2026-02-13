@@ -50,8 +50,11 @@ if [[ ! -f "${DISK_PATH}" ]]; then
 fi
 if [[ "${FORCE:-0}" != "1" ]]; then
   echo "⚠️  About to WIPE and repartition:"
+  echo "    DISK_MODE=${DISK_MODE}"
   echo "    BOOTA_BYID=${BOOTA_BYID}"
-  echo "    BOOTB_BYID=${BOOTB_BYID}"
+  if [[ "${DISK_MODE}" == "mirror" ]]; then
+    echo "    BOOTB_BYID=${BOOTB_BYID}"
+  fi
   read -r -p "Continue? (y/N) " ans
   case "${ans}" in
     [yY]|[yY][eE][sS]) ;;
