@@ -13,6 +13,6 @@ if [[ -f /etc/bowenos/flake.nix ]]; then
   fi
   sudo nixos-rebuild switch --refresh --impure --flake "path:/etc/bowenos#${HOST}"
 else
-  echo "Missing /etc/bowenos" >&2
+  echo "Missing /etc/bowenos/flake.nix. Ensure host config is present in /etc/bowenos." >&2
   exit 1
 fi
