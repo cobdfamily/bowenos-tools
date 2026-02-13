@@ -18,7 +18,7 @@ fi
 select_host_from_inventory "${INVENTORY_ROOT}"
 
 if [[ -z "${HOST}" ]]; then
-  echo "HOST could not be determined for disko." >&2
+  echo "HOST could not be determined for partitioning." >&2
   exit 2
 fi
 if [[ -n "${HOST}" ]]; then
@@ -54,12 +54,13 @@ if [[ "${FORCE:-0}" != "1" ]]; then
     *) echo "Aborted."; exit 1 ;;
   esac
 fi
+echo "Partitioning with Disko..."
 nix --extra-experimental-features "nix-command flakes" run --impure \
   github:nix-community/disko -- \
   --mode disko ${DISK_PATH}
 
 echo
-echo "Post-disko validation:"
+echo "Post-partition validation:"
 if command -v zpool >/dev/null 2>&1; then
   zpool import -N rpool >/dev/null 2>&1 || true
   zpool get -H bootfs rpool || true
