@@ -79,7 +79,6 @@
 
           # Try to ensure ZFS kernel module is available
           boot.supportedFilesystems = [ "zfs" ];
-          boot.zfs.enableUnstable = false;
 
           # Pin a kernel series that commonly has ZFS wired up in nixpkgs.
           # If this line ever causes evaluation errors on your pin, swap to:
