@@ -37,15 +37,6 @@ if [[ "${DISK_MODE:-mirror}" == "mirror" && -z "${BOOTB_BYID:-}" ]]; then
 fi
 PARTITION_ROOT="/tmp/bowenos-partitioning"
 PARTITION_REPO="https://github.com/cobdfamily/bowenos"
-
-${RM} -rf "${PARTITION_ROOT}"
-git clone --depth 1 "${PARTITION_REPO}" "${PARTITION_ROOT}"
-
-DISK_PATH="${PARTITION_ROOT}/targets/${TARGET}/disks.nix"
-if [[ ! -f "${DISK_PATH}" ]]; then
-  echo "Could not find disk file for target '${TARGET}': ${DISK_PATH}" >&2
-  exit 2
-fi
 if [[ "${FORCE:-0}" != "1" ]]; then
   echo "⚠️  About to WIPE and repartition:"
   echo "    DISK_MODE=${DISK_MODE}"
@@ -58,6 +49,14 @@ if [[ "${FORCE:-0}" != "1" ]]; then
     [yY]|[yY][eE][sS]) ;;
     *) echo "Aborted."; exit 1 ;;
   esac
+fi
+${RM} -rf "${PARTITION_ROOT}"
+git clone --depth 1 "${PARTITION_REPO}" "${PARTITION_ROOT}"
+
+DISK_PATH="${PARTITION_ROOT}/targets/${TARGET}/disks.nix"
+if [[ ! -f "${DISK_PATH}" ]]; then
+  echo "Could not find disk file for target '${TARGET}': ${DISK_PATH}" >&2
+  exit 2
 fi
 echo "Partitioning with Disko..."
 nix --extra-experimental-features "nix-command flakes" run --impure \
