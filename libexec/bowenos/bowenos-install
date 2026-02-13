@@ -11,11 +11,7 @@ if [[ -f /tmp/bowenos/flake.nix ]]; then
     ${MKDIR} -p /mnt/persist/etc/bowenos
     ${CP} -a /tmp/bowenos/. /mnt/persist/etc/bowenos/
   fi
-  extra_flags=()
-  if [[ -d /tmp/installer ]]; then
-    extra_flags+=(--override-input bowenos "path:/tmp/installer")
-  fi
-  nixos-install --impure --flake "path:/tmp/bowenos#${HOST}" "${extra_flags[@]}"
+  nixos-install --refresh --impure --flake "path:/tmp/bowenos#${HOST}"
 else
   echo "Missing /tmp/bowenos/flake.nix. Run bowenos setup first." >&2
   exit 2
