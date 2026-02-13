@@ -51,7 +51,10 @@ if [[ "${FORCE:-0}" != "1" ]]; then
   esac
 fi
 ${RM} -rf "${PARTITION_ROOT}"
-git clone --depth 1 "${PARTITION_REPO}" "${PARTITION_ROOT}"
+if ! git clone --depth 1 "${PARTITION_REPO}" "${PARTITION_ROOT}"; then
+  echo "Failed to fetch bowenos partition sources from GitHub." >&2
+  exit 2
+fi
 
 DISK_PATH="${PARTITION_ROOT}/targets/${TARGET}/disks.nix"
 if [[ ! -f "${DISK_PATH}" ]]; then
