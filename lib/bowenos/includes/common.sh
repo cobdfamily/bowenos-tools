@@ -139,6 +139,33 @@ select_host_if_needed() {
   select_host_from_inventory "/tmp/bowenos"
 }
 
+validate_target() {
+  local target="$1"
+  local host="${2:-${HOST:-unknown}}"
+  local source_path="${3:-hosts/${host}/local.nix}"
+
+  case "${target}" in
+    compute|computeplusstorage|storage) ;;
+    *)
+      echo "Invalid target '${target}' in ${source_path}. Expected one of: compute, computeplusstorage, storage." >&2
+      exit 2
+      ;;
+  esac
+}
+
+load_target_from_inventory() {
+  local inventory_root="${1:-/tmp/bowenos}"
+  local host="${2:-${HOST:-}}"
+
+  if [[ -z "${host}" ]]; then
+    echo "HOST is required to load target from inventory." >&2
+    exit 2
+  fi
+
+  TARGET="$(nix eval --raw "path:${inventory_root}#hostInfo.${host}.target")"
+  validate_target "${TARGET}" "${host}" "hosts/${host}/local.nix"
+}
+
 ensure_mountpoint() {
   local path="$1"
   local label="$2"

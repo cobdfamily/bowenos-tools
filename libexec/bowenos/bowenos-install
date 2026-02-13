@@ -7,6 +7,7 @@ source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 
 if [[ -f /tmp/bowenos/flake.nix ]]; then
   select_host_from_inventory "/tmp/bowenos"
+  load_target_from_inventory "/tmp/bowenos" "${HOST}"
   if ! mountpoint -q /mnt/persist; then
     echo "/mnt/persist is not mounted. Refusing to copy inventory into the live environment." >&2
     exit 2

@@ -22,7 +22,7 @@ if [[ -z "${HOST}" ]]; then
   exit 2
 fi
 if [[ -n "${HOST}" ]]; then
-  TARGET="$(nix eval --raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.target")"
+  load_target_from_inventory "${INVENTORY_ROOT}" "${HOST}"
   BOOTA_BYID="$(nix eval --raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootaById")"
   BOOTB_BYID="$(nix eval --raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootbById")"
   DISK_MODE="$(nix eval --raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.diskMode")"
@@ -37,13 +37,6 @@ if [[ "${DISK_MODE:-mirror}" == "mirror" && -z "${BOOTB_BYID:-}" ]]; then
   echo "Set bootbById in hosts/${HOST}/local.nix for mirror mode." >&2
   exit 2
 fi
-case "${TARGET}" in
-  compute|computeplusstorage|storage) ;;
-  *)
-    echo "Invalid target '${TARGET}' in hosts/${HOST}/local.nix. Expected one of: compute, computeplusstorage, storage." >&2
-    exit 2
-    ;;
-esac
 PARTITION_ROOT="/tmp/bowenos-partitioning"
 PARTITION_REPO="https://github.com/cobdfamily/bowenos"
 
