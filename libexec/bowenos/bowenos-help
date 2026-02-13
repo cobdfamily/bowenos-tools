@@ -14,7 +14,7 @@ Commands:
 
 Notes:
   setup clones from bowenos-inventory-template.
-  target in /tmp/bowenos/hosts/<host>/local.nix must be one of: compute, computeplusstorage, storage.
+  target in host local.nix must be one of: compute, computeplusstorage, storage.
   install requires /mnt/persist (inventory is copied to /mnt/persist/etc/bowenos); run partition first.
   update may mount boot ESPs before rebuild.
 USAGE
