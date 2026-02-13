@@ -7,6 +7,10 @@ source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 
 if [[ -f /tmp/bowenos/flake.nix ]]; then
   select_host_from_inventory "/tmp/bowenos"
+  if ! mountpoint -q /mnt/persist; then
+    echo "/mnt/persist is not mounted. Refusing to copy inventory into the live environment." >&2
+    exit 2
+  fi
   ${MKDIR} -p /mnt/persist/etc/bowenos
   ${CP} -a /tmp/bowenos/. /mnt/persist/etc/bowenos/
   nixos-install --refresh --impure --flake "path:/tmp/bowenos#${HOST}"
