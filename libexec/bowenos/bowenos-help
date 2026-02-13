@@ -8,7 +8,7 @@ Commands:
   create-iso   Build bootstrap ISO
   setup        Create /tmp/bowenos from inventory template
   partition    Apply target disk layout with disko (destructive)
-  install      Install NixOS for selected inventory host
+  install      Install NixOS for selected inventory host (/mnt/persist required)
   update       Switch system for current host
   hardware-scan [DIR]  Generate hardware-configuration.nix in CWD or DIR
 USAGE
