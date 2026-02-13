@@ -7,9 +7,9 @@ LIBEXEC_DIR="${BIN_DIR}/../libexec/bowenos"
 cmd="${1:-}"
 shift || true
 
-if [[ -z "${cmd}" ]]; then
+if [[ -z "${cmd}" || "${cmd}" == "-h" || "${cmd}" == "--help" ]]; then
   "${LIBEXEC_DIR}/bowenos-help"
-  exit 2
+  exit 0
 fi
 
 subcmd="${LIBEXEC_DIR}/bowenos-${cmd}"
