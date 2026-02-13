@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=../../lib/bowenos/includes/common.sh
+source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
+
+if [[ -f /tmp/bowenos/flake.nix ]]; then
+  select_host_if_needed
+  if [[ -d /tmp/bowenos ]]; then
+    ${MKDIR} -p /mnt/persist/etc/bowenos
+    ${CP} -a /tmp/bowenos/. /mnt/persist/etc/bowenos/
+  fi
+  extra_flags=()
+  if [[ -d /tmp/installer ]]; then
+    extra_flags+=(--override-input bowenos "path:/tmp/installer")
+  fi
+  nixos-install --impure --flake "path:/tmp/bowenos#${HOST}" "${extra_flags[@]}"
+else
+  echo "Missing /tmp/bowenos/flake.nix. Run bowenos setup first." >&2
+  exit 2
+fi

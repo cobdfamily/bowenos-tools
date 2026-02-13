@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=../../lib/bowenos/includes/common.sh
+source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
+
+if [[ -f /etc/bowenos/flake.nix ]]; then
+  HOST="$(cat /etc/hostname)"
+  ensure_mountpoint /boot "disk-bootA-esp"
+  if [[ -e /dev/disk/by-partlabel/disk-bootB-esp ]]; then
+    ensure_mountpoint /bootB "disk-bootB-esp"
+  fi
+  extra_flags=()
+  if [[ -d /tmp/installer ]]; then
+    extra_flags+=(--override-input bowenos "path:/tmp/installer")
+  fi
+  sudo nixos-rebuild switch --impure --flake "path:/etc/bowenos#${HOST}" "${extra_flags[@]}"
+else
+  echo "Missing /tmp/bowenos" >&2
+  exit 1
+fi

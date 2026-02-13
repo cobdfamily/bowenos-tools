@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LIBEXEC_DIR="${BIN_DIR}/../libexec/bowenos"
+
+cmd="${1:-}"
+shift || true
+
+if [[ -z "${cmd}" ]]; then
+  "${LIBEXEC_DIR}/bowen-help"
+  exit 2
+fi
+
+subcmd="${LIBEXEC_DIR}/bowen-${cmd}"
+if [[ ! -x "${subcmd}" ]]; then
+  echo "Unknown command: ${cmd}" >&2
+  echo >&2
+  "${LIBEXEC_DIR}/bowen-help" >&2
+  exit 2
+fi
+
+"${subcmd}" "$@"

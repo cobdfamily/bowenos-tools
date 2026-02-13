@@ -1,0 +1,9 @@
+result*
+.direnv/
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
