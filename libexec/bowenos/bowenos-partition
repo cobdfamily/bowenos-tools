@@ -76,10 +76,18 @@ nix_run --impure \
 
 echo
 echo "Post-partition validation:"
-if command -v zpool >/dev/null 2>&1; then
-  zpool import -N rpool >/dev/null 2>&1 || true
-  zpool get -H bootfs rpool || true
-  zfs list -r rpool || true
+if [[ "${TARGET}" == "spine" ]]; then
+  if [[ -e /dev/disk/by-partlabel/disk-bootA-persist ]]; then
+    blkid /dev/disk/by-partlabel/disk-bootA-persist || true
+  else
+    echo "  Persist partition label not found: /dev/disk/by-partlabel/disk-bootA-persist"
+  fi
 else
-  echo "  zpool not found; skipping ZFS validation."
+  if command -v zpool >/dev/null 2>&1; then
+    zpool import -N rpool >/dev/null 2>&1 || true
+    zpool get -H bootfs rpool || true
+    zfs list -r rpool || true
+  else
+    echo "  zpool not found; skipping ZFS validation."
+  fi
 fi

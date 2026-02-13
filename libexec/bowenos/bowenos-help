@@ -15,7 +15,7 @@ Commands:
 Notes:
   setup clones a fresh shallow inventory from bowenos-inventory-template.
   setup validates hostname characters, hostId format, and SSH key prefix.
-  target in host local.nix must be one of: compute, computeplusstorage, storage.
+  target in host local.nix must be one of: compute, computeplusstorage, storage, spine.
   mirror disk mode requires at least two distinct disks.
   install requires /mnt/persist (inventory is copied to /mnt/persist/etc/bowenos); run partition first.
   update may mount boot ESPs before rebuild.

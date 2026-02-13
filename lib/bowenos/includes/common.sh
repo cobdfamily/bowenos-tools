@@ -181,9 +181,9 @@ validate_target() {
   local source_path="${3:-hosts/${host}/local.nix}"
 
   case "${target}" in
-    compute|computeplusstorage|storage) ;;
+    compute|computeplusstorage|storage|spine) ;;
     *)
-      echo "Invalid target '${target}' in ${source_path}. Expected one of: compute, computeplusstorage, storage." >&2
+      echo "Invalid target '${target}' in ${source_path}. Expected one of: compute, computeplusstorage, storage, spine." >&2
       exit 2
       ;;
   esac
