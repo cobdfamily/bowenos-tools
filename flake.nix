@@ -1,5 +1,5 @@
 {
-  description = "Bootstrap ISO with nix + ssh + disko + zfs (serial friendly, with ttyS0 first)";
+  description = "BowenOS Installer and Recovery with nix + ssh + disko + zfs (serial friendly, with ttyS0 first)";
 
   inputs = {
     # Pin nixpkgs to something stable so ZFS is less likely to break.
@@ -30,7 +30,7 @@
       bowenos-tools = final.callPackage ./nix/package.nix { };
     };
 
-    nixosConfigurations.bootstrap-iso = nixpkgs.lib.nixosSystem {
+    nixosConfigurations.bowenos-installer-recovery = nixpkgs.lib.nixosSystem {
       system = isoSystem;
       modules = [
         # Minimal installer ISO base
@@ -92,7 +92,7 @@
           # Quality-of-life: show IP on login, etc. (optional)
           programs.bash.interactiveShellInit = ''
             echo
-            echo "Bootstrap ISO ready."
+            echo "BowenOS Installer and Recovery ready."
             echo "IP addresses:"
             ip -brief addr || true
             echo
@@ -108,13 +108,14 @@
         disko.nixosModules.disko
       ];
     };
+    nixosConfigurations.bootstrap-iso = self.nixosConfigurations.bowenos-installer-recovery;
 
     packages = forAllSystems ({ system, pkgs }: {
       default = pkgs.bowenos-tools;
       bowenos-tools = pkgs.bowenos-tools;
     } // lib.optionalAttrs (system == isoSystem) {
       # Convenience output: `nix build .#iso`
-      iso = self.nixosConfigurations.bootstrap-iso.config.system.build.isoImage;
+      iso = self.nixosConfigurations.bowenos-installer-recovery.config.system.build.isoImage;
     });
 
     apps = forAllSystems ({ pkgs, ... }: {

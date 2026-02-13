@@ -5,7 +5,7 @@ cat <<'USAGE'
 Usage: bowenos <command>
 
 Commands:
-  create-iso   Build bootstrap ISO
+  create-iso   Build BowenOS Installer and Recovery ISO
   setup        Create /tmp/bowenos inventory
   partition    Apply target disk layout with Disko (destructive)
   install      Install NixOS for selected inventory host
