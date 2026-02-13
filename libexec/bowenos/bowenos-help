@@ -9,6 +9,6 @@ Commands:
   setup        Create /tmp/bowenos inventory for a new host
   partition    Partition + create mirrored rpool (destructive)
   install      Run nixos-install for host in inventory
-  update       Run nixos-rebuild switch for host in inventory
+  update       Run nixos-rebuild switch for current host
   hardware-scan  Generate hardware-configuration.nix in CWD or given dir
 USAGE
