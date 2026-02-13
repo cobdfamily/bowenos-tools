@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 
 if [[ -f /tmp/bowenos/flake.nix ]]; then
-  select_host_if_needed
+  select_host_from_inventory "/tmp/bowenos"
   if [[ -d /tmp/bowenos ]]; then
     ${MKDIR} -p /mnt/persist/etc/bowenos
     ${CP} -a /tmp/bowenos/. /mnt/persist/etc/bowenos/

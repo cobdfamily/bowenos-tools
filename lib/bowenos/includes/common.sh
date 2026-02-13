@@ -96,19 +96,22 @@ select_disk_by_id() {
   done
 }
 
-select_host_if_needed() {
+select_host_from_inventory() {
+  local inventory_root="${1:-/tmp/bowenos}"
+  local hosts_dir="${inventory_root}/hosts"
+
   if [[ -n "${HOST}" ]]; then
     return 0
   fi
 
-  if [[ ! -d /tmp/bowenos/hosts ]]; then
-    echo "HOST is not set and /tmp/bowenos/hosts does not exist." >&2
+  if [[ ! -d "${hosts_dir}" ]]; then
+    echo "HOST is not set and ${hosts_dir} does not exist." >&2
     exit 2
   fi
 
-  mapfile -t _hosts < <(find /tmp/bowenos/hosts -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort)
+  mapfile -t _hosts < <(find "${hosts_dir}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort)
   if [[ ${#_hosts[@]} -eq 0 ]]; then
-    echo "No hosts found under /tmp/bowenos/hosts." >&2
+    echo "No hosts found under ${hosts_dir}." >&2
     exit 2
   fi
 
@@ -130,6 +133,10 @@ select_host_if_needed() {
     echo "Invalid selection." >&2
     exit 2
   fi
+}
+
+select_host_if_needed() {
+  select_host_from_inventory "/tmp/bowenos"
 }
 
 ensure_mountpoint() {

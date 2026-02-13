@@ -15,30 +15,7 @@ if [[ ! -d "${INVENTORY_ROOT}/hosts" ]]; then
   exit 2
 fi
 
-if [[ -z "${HOST}" ]]; then
-  mapfile -t _hosts < <(find "${INVENTORY_ROOT}/hosts" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | sort)
-  if [[ ${#_hosts[@]} -eq 0 ]]; then
-    echo "No hosts found under ${INVENTORY_ROOT}/hosts." >&2
-    exit 2
-  fi
-  if [[ ${#_hosts[@]} -eq 1 ]]; then
-    HOST="${_hosts[0]}"
-  else
-    echo "HOST is not set. Select a host:"
-    i=1
-    for h in "${_hosts[@]}"; do
-      echo "  ${i}) ${h}"
-      i=$((i + 1))
-    done
-    read -r -p "Select host number: " idx
-    if [[ "${idx}" =~ ^[0-9]+$ ]] && (( idx >= 1 && idx <= ${#_hosts[@]} )); then
-      HOST="${_hosts[$((idx-1))]}"
-    else
-      echo "Invalid selection." >&2
-      exit 2
-    fi
-  fi
-fi
+select_host_from_inventory "${INVENTORY_ROOT}"
 
 if [[ -z "${HOST}" ]]; then
   echo "HOST could not be determined for disko." >&2
