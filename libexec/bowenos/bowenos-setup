@@ -12,17 +12,12 @@ if [[ -z "${HOSTNAME}" ]]; then
 fi
 
 ${RM} -rf /tmp/bowenos
-${MKDIR} -p /tmp/bowenos
 
 # Copy inventory flake
-${CP} "${INVENTORY_ROOT}/flake.nix" /tmp/bowenos/flake.nix
-if [[ -f "${INVENTORY_ROOT}/flake.lock" ]]; then
-  ${CP} "${INVENTORY_ROOT}/flake.lock" /tmp/bowenos/flake.lock
-fi
+git clone "https://github.com/cobdfamily/bowenos-inventory-template" /tmp/bowenos/
 
 # Copy example host
-${MKDIR} -p "/tmp/bowenos/hosts/${HOSTNAME}"
-${CP} "${INVENTORY_ROOT}/hosts/example/local.nix" "/tmp/bowenos/hosts/${HOSTNAME}/local.nix"
+mv "/tmp/bowenos/hosts/example" "/tmp/bowenos/hosts/${HOSTNAME}"
 
 # Disk mode
 read -r -p "Disk mode (mirror/single) [mirror]: " DISK_MODE
