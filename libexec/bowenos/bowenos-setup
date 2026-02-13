@@ -23,6 +23,10 @@ if ! git clone "https://github.com/cobdfamily/bowenos-inventory-template" /tmp/b
   echo "Failed to clone bowenos-inventory-template into /tmp/bowenos." >&2
   exit 2
 fi
+if [[ ! -f "/tmp/bowenos/flake.nix" ]]; then
+  echo "Template inventory is missing /tmp/bowenos/flake.nix." >&2
+  exit 2
+fi
 if [[ ! -d "/tmp/bowenos/hosts" ]]; then
   echo "Template inventory is missing /tmp/bowenos/hosts." >&2
   exit 2
@@ -38,23 +42,21 @@ if [[ -e "/tmp/bowenos/hosts/${HOSTNAME}" ]]; then
   exit 2
 fi
 mv "/tmp/bowenos/hosts/example" "/tmp/bowenos/hosts/${HOSTNAME}"
+if [[ ! -f "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" ]]; then
+  echo "Template host is missing /tmp/bowenos/hosts/${HOSTNAME}/local.nix." >&2
+  exit 2
+fi
 
 # Disk mode
 read -r -p "Disk mode (mirror/single) [mirror]: " DISK_MODE
 DISK_MODE="${DISK_MODE:-mirror}"
-if [[ "${DISK_MODE}" != "mirror" && "${DISK_MODE}" != "single" ]]; then
-  echo "Invalid disk mode." >&2
-  exit 2
-fi
+validate_disk_mode "${DISK_MODE}" "hosts/${HOSTNAME}/local.nix"
 set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "diskMode" "\"${DISK_MODE}\""
 
 # Boot mode
 read -r -p "Boot mode (uefi/bios) [uefi]: " BOOT_MODE
 BOOT_MODE="${BOOT_MODE:-uefi}"
-if [[ "${BOOT_MODE}" != "uefi" && "${BOOT_MODE}" != "bios" ]]; then
-  echo "Invalid boot mode." >&2
-  exit 2
-fi
+validate_boot_mode "${BOOT_MODE}" "hosts/${HOSTNAME}/local.nix"
 set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "bootMode" "\"${BOOT_MODE}\""
 
 # Admin user + SSH key
@@ -99,6 +101,10 @@ if [[ ${#disks[@]} -eq 0 ]]; then
   echo "No disks found in /dev/disk/by-id." >&2
   exit 2
 fi
+if [[ "${DISK_MODE}" == "mirror" && ${#disks[@]} -lt 2 ]]; then
+  echo "Mirror mode requires at least two distinct disks in /dev/disk/by-id." >&2
+  exit 2
+fi
 
 selected=()
 select_disk_by_id "Select BOOTA_BYID:" disks selected
@@ -115,5 +121,9 @@ fi
 
 # Hardware scan
 "${SCRIPT_DIR}/bowenos-hardware-scan" "/tmp/bowenos/hosts/${HOSTNAME}"
+if [[ ! -f "/tmp/bowenos/hosts/${HOSTNAME}/hardware-configuration.nix" ]]; then
+  echo "Hardware scan did not produce /tmp/bowenos/hosts/${HOSTNAME}/hardware-configuration.nix." >&2
+  exit 2
+fi
 
 echo "Inventory written to /tmp/bowenos/hosts/${HOSTNAME}"

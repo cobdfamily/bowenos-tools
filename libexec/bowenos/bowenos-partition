@@ -28,6 +28,8 @@ BOOTA_BYID="$(nix eval --raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootaById")"
 BOOTB_BYID="$(nix eval --raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootbById")"
 DISK_MODE="$(nix eval --raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.diskMode")"
 BOOT_MODE="$(nix eval --raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.bootMode")"
+validate_disk_mode "${DISK_MODE}" "hosts/${HOST}/local.nix"
+validate_boot_mode "${BOOT_MODE}" "hosts/${HOST}/local.nix"
 export BOOTA_BYID BOOTB_BYID DISK_MODE BOOT_MODE
 if [[ -z "${BOOTA_BYID:-}" ]]; then
   echo "Set bootaById in hosts/${HOST}/local.nix." >&2

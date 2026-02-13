@@ -10,13 +10,33 @@
 
   outputs = { self, nixpkgs, disko, ... }:
   let
-    system = "x86_64-linux";
+    inherit (nixpkgs) lib;
+    isoSystem = "x86_64-linux";
+    systems = [
+      "x86_64-linux"
+      "aarch64-linux"
+    ];
+    forAllSystems = f:
+      nixpkgs.lib.genAttrs systems (system:
+        f {
+          inherit system;
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ self.overlays.default ];
+          };
+        });
   in {
+    overlays.default = final: prev: {
+      bowenos-tools = final.callPackage ./nix/package.nix { };
+    };
+
     nixosConfigurations.bootstrap-iso = nixpkgs.lib.nixosSystem {
-      inherit system;
+      system = isoSystem;
       modules = [
         # Minimal installer ISO base
         ({ pkgs, lib, ... }: {
+          nixpkgs.overlays = [ self.overlays.default ];
+
           imports = [
             "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
           ];
@@ -46,12 +66,13 @@
           nix.settings.sandbox = false; # makes life easier in live/rescue contexts
 
           environment.systemPackages = with pkgs; [
+            bowenos-tools
             curl
             git
             tmux
             htop
             # disko (both the input and the package exist; package is simplest)
-            disko.packages.${system}.default
+            disko.packages.${isoSystem}.default
             # ZFS userspace tools
             zfs
           ];
@@ -88,8 +109,25 @@
       ];
     };
 
-    # Convenience output: `nix build .#iso`
-    packages.${system}.iso =
-      self.nixosConfigurations.bootstrap-iso.config.system.build.isoImage;
+    packages = forAllSystems ({ system, pkgs }: {
+      default = pkgs.bowenos-tools;
+      bowenos-tools = pkgs.bowenos-tools;
+    } // lib.optionalAttrs (system == isoSystem) {
+      # Convenience output: `nix build .#iso`
+      iso = self.nixosConfigurations.bootstrap-iso.config.system.build.isoImage;
+    });
+
+    apps = forAllSystems ({ pkgs, ... }: {
+      default = {
+        type = "app";
+        program = "${pkgs.bowenos-tools}/bin/bowenos";
+      };
+      bowenos = {
+        type = "app";
+        program = "${pkgs.bowenos-tools}/bin/bowenos";
+      };
+    });
+
+    nixosModules.default = import ./nix/module.nix;
   };
 }

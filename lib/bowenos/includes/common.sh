@@ -11,6 +11,24 @@ require_command() {
   fi
 }
 
+validate_disk_mode() {
+  local mode="$1"
+  local source="${2:-inventory}"
+  if [[ "${mode}" != "mirror" && "${mode}" != "single" ]]; then
+    echo "Invalid disk mode '${mode}' in ${source}. Expected: mirror or single." >&2
+    exit 2
+  fi
+}
+
+validate_boot_mode() {
+  local mode="$1"
+  local source="${2:-inventory}"
+  if [[ "${mode}" != "uefi" && "${mode}" != "bios" ]]; then
+    echo "Invalid boot mode '${mode}' in ${source}. Expected: uefi or bios." >&2
+    exit 2
+  fi
+}
+
 COREUTILS_ROOT="$(nix eval --raw --impure 'with import <nixpkgs> {}; pkgs.coreutils' 2>/dev/null || true)"
 if [[ -n "${COREUTILS_ROOT}" ]]; then
   COREUTILS_BIN="${COREUTILS_ROOT}/bin"

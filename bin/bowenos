@@ -2,7 +2,12 @@
 set -euo pipefail
 
 BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LIBEXEC_DIR="${BIN_DIR}/../libexec/bowenos"
+LIBEXEC_DIR="${BOWENOS_LIBEXEC_DIR:-${BIN_DIR}/../libexec/bowenos}"
+
+if [[ ! -d "${LIBEXEC_DIR}" ]]; then
+  echo "Unable to locate bowenos libexec directory: ${LIBEXEC_DIR}" >&2
+  exit 2
+fi
 
 cmd="${1:-}"
 shift || true
