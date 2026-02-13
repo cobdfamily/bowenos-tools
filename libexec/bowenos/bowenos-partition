@@ -21,13 +21,11 @@ if [[ -z "${HOST}" ]]; then
   echo "HOST could not be determined for partitioning." >&2
   exit 2
 fi
-if [[ -n "${HOST}" ]]; then
-  load_target_from_inventory "${INVENTORY_ROOT}" "${HOST}"
-  BOOTA_BYID="$(nix eval --raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootaById")"
-  BOOTB_BYID="$(nix eval --raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootbById")"
-  DISK_MODE="$(nix eval --raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.diskMode")"
-  BOOT_MODE="$(nix eval --raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.bootMode")"
-fi
+load_target_from_inventory "${INVENTORY_ROOT}" "${HOST}"
+BOOTA_BYID="$(nix eval --raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootaById")"
+BOOTB_BYID="$(nix eval --raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootbById")"
+DISK_MODE="$(nix eval --raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.diskMode")"
+BOOT_MODE="$(nix eval --raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.bootMode")"
 export BOOTA_BYID BOOTB_BYID DISK_MODE BOOT_MODE
 if [[ -z "${BOOTA_BYID:-}" ]]; then
   echo "Set bootaById in hosts/${HOST}/local.nix." >&2
