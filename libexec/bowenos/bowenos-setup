@@ -6,6 +6,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 
 require_command git
+INVENTORY_ROOT="/tmp/bowenos"
+TEMPLATE_REPO="${BOWENOS_TEMPLATE_REPO:-https://github.com/cobdfamily/bowenos-inventory-template}"
+
 read -r -p "Hostname: " HOSTNAME
 if [[ -z "${HOSTNAME}" ]]; then
   echo "Hostname is required." >&2
@@ -16,34 +19,34 @@ if [[ ! "${HOSTNAME}" =~ ^[a-zA-Z0-9._-]+$ ]]; then
   exit 2
 fi
 
-${RM} -rf /tmp/bowenos
+${RM} -rf "${INVENTORY_ROOT}"
 
 # Copy inventory flake
-if ! git clone "https://github.com/cobdfamily/bowenos-inventory-template" /tmp/bowenos/; then
-  echo "Failed to clone bowenos-inventory-template into /tmp/bowenos." >&2
+if ! git clone --depth 1 --single-branch "${TEMPLATE_REPO}" "${INVENTORY_ROOT}/"; then
+  echo "Failed to clone bowenos-inventory-template into ${INVENTORY_ROOT}." >&2
   exit 2
 fi
-if [[ ! -f "/tmp/bowenos/flake.nix" ]]; then
-  echo "Template inventory is missing /tmp/bowenos/flake.nix." >&2
+if [[ ! -f "${INVENTORY_ROOT}/flake.nix" ]]; then
+  echo "Template inventory is missing ${INVENTORY_ROOT}/flake.nix." >&2
   exit 2
 fi
-if [[ ! -d "/tmp/bowenos/hosts" ]]; then
-  echo "Template inventory is missing /tmp/bowenos/hosts." >&2
+if [[ ! -d "${INVENTORY_ROOT}/hosts" ]]; then
+  echo "Template inventory is missing ${INVENTORY_ROOT}/hosts." >&2
   exit 2
 fi
 
 # Copy example host
-if [[ ! -d "/tmp/bowenos/hosts/example" ]]; then
-  echo "Template inventory is missing /tmp/bowenos/hosts/example." >&2
+if [[ ! -d "${INVENTORY_ROOT}/hosts/example" ]]; then
+  echo "Template inventory is missing ${INVENTORY_ROOT}/hosts/example." >&2
   exit 2
 fi
-if [[ -e "/tmp/bowenos/hosts/${HOSTNAME}" ]]; then
-  echo "Host path already exists: /tmp/bowenos/hosts/${HOSTNAME}" >&2
+if [[ -e "${INVENTORY_ROOT}/hosts/${HOSTNAME}" ]]; then
+  echo "Host path already exists: ${INVENTORY_ROOT}/hosts/${HOSTNAME}" >&2
   exit 2
 fi
-mv "/tmp/bowenos/hosts/example" "/tmp/bowenos/hosts/${HOSTNAME}"
-if [[ ! -f "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" ]]; then
-  echo "Template host is missing /tmp/bowenos/hosts/${HOSTNAME}/local.nix." >&2
+mv "${INVENTORY_ROOT}/hosts/example" "${INVENTORY_ROOT}/hosts/${HOSTNAME}"
+if [[ ! -f "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" ]]; then
+  echo "Template host is missing ${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix." >&2
   exit 2
 fi
 
@@ -51,18 +54,22 @@ fi
 read -r -p "Disk mode (mirror/single) [mirror]: " DISK_MODE
 DISK_MODE="${DISK_MODE:-mirror}"
 validate_disk_mode "${DISK_MODE}" "hosts/${HOSTNAME}/local.nix"
-set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "diskMode" "\"${DISK_MODE}\""
+set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "diskMode" "\"${DISK_MODE}\""
 
 # Boot mode
 read -r -p "Boot mode (uefi/bios) [uefi]: " BOOT_MODE
 BOOT_MODE="${BOOT_MODE:-uefi}"
 validate_boot_mode "${BOOT_MODE}" "hosts/${HOSTNAME}/local.nix"
-set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "bootMode" "\"${BOOT_MODE}\""
+set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "bootMode" "\"${BOOT_MODE}\""
 
 # Admin user + SSH key
 read -r -p "Admin username [admin]: " ADMIN_USER
 ADMIN_USER="${ADMIN_USER:-admin}"
-set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "adminUser" "\"${ADMIN_USER}\""
+if [[ ! "${ADMIN_USER}" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+  echo "Admin username must start with a lowercase letter or underscore and contain only lowercase letters, digits, underscore, and dash." >&2
+  exit 2
+fi
+set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "adminUser" "\"${ADMIN_USER}\""
 
 # Host identity
 read -r -p "Host ID (8 hex chars) [deadbeef]: " HOST_ID
@@ -71,15 +78,23 @@ if [[ ! "${HOST_ID}" =~ ^[0-9a-fA-F]{8}$ ]]; then
   echo "Host ID must be exactly 8 hexadecimal characters." >&2
   exit 2
 fi
-set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "hostId" "\"${HOST_ID}\""
+set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "hostId" "\"${HOST_ID}\""
 
 read -r -p "Timezone [America/Vancouver]: " TIMEZONE
 TIMEZONE="${TIMEZONE:-America/Vancouver}"
-set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "timeZone" "\"${TIMEZONE}\""
+if [[ "${TIMEZONE}" == *$'\n'* || "${TIMEZONE}" == *$'\r'* ]]; then
+  echo "Timezone must be a single-line value." >&2
+  exit 2
+fi
+set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "timeZone" "\"${TIMEZONE}\""
 
 read -r -p "Locale [en_CA.UTF-8]: " LOCALE
 LOCALE="${LOCALE:-en_CA.UTF-8}"
-set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "locale" "\"${LOCALE}\""
+if [[ "${LOCALE}" == *$'\n'* || "${LOCALE}" == *$'\r'* ]]; then
+  echo "Locale must be a single-line value." >&2
+  exit 2
+fi
+set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "locale" "\"${LOCALE}\""
 
 read -r -p "SSH public key: " SSH_KEY
 if [[ -z "${SSH_KEY}" ]]; then
@@ -90,13 +105,17 @@ if [[ "${SSH_KEY}" != ssh-* ]]; then
   echo "SSH public key must start with ssh- (for example ssh-ed25519 ...)." >&2
   exit 2
 fi
-set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "sshPubKey" "\"${SSH_KEY}\""
-set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "allowNoKey" "false"
-set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "sudoNeedsPassword" "false"
-set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "mutableUsers" "false"
+set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "sshPubKey" "\"${SSH_KEY}\""
+set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "allowNoKey" "false"
+set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "sudoNeedsPassword" "false"
+set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "mutableUsers" "false"
 
 # Disk selection menu
-mapfile -t disks < <(ls -1 /dev/disk/by-id | grep -v -- '-part' | sort -u)
+if [[ ! -d /dev/disk/by-id ]]; then
+  echo "Missing /dev/disk/by-id." >&2
+  exit 2
+fi
+mapfile -t disks < <(find /dev/disk/by-id -mindepth 1 -maxdepth 1 -printf "%f\n" | grep -v -- '-part' | sort -u)
 if [[ ${#disks[@]} -eq 0 ]]; then
   echo "No disks found in /dev/disk/by-id." >&2
   exit 2
@@ -112,18 +131,18 @@ if [[ "${DISK_MODE}" == "mirror" ]]; then
   select_disk_by_id "Select BOOTB_BYID:" disks selected
 fi
 
-set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "bootaById" "\"${selected[0]}\""
+set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "bootaById" "\"${selected[0]}\""
 if [[ "${DISK_MODE}" == "mirror" ]]; then
-  set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "bootbById" "\"${selected[1]}\""
+  set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "bootbById" "\"${selected[1]}\""
 else
-  set_local_nix_value "/tmp/bowenos/hosts/${HOSTNAME}/local.nix" "bootbById" "\"\""
+  set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "bootbById" "\"\""
 fi
 
 # Hardware scan
-"${SCRIPT_DIR}/bowenos-hardware-scan" "/tmp/bowenos/hosts/${HOSTNAME}"
-if [[ ! -f "/tmp/bowenos/hosts/${HOSTNAME}/hardware-configuration.nix" ]]; then
-  echo "Hardware scan did not produce /tmp/bowenos/hosts/${HOSTNAME}/hardware-configuration.nix." >&2
+"${SCRIPT_DIR}/bowenos-hardware-scan" "${INVENTORY_ROOT}/hosts/${HOSTNAME}"
+if [[ ! -f "${INVENTORY_ROOT}/hosts/${HOSTNAME}/hardware-configuration.nix" ]]; then
+  echo "Hardware scan did not produce ${INVENTORY_ROOT}/hosts/${HOSTNAME}/hardware-configuration.nix." >&2
   exit 2
 fi
 
-echo "Inventory written to /tmp/bowenos/hosts/${HOSTNAME}"
+echo "Inventory written to ${INVENTORY_ROOT}/hosts/${HOSTNAME}"

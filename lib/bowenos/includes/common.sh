@@ -12,6 +12,11 @@ require_command() {
   fi
 }
 
+nix_run() {
+  require_command nix
+  nix "${NIX_FLAKE_FLAGS[@]}" run "$@"
+}
+
 nix_eval_raw() {
   require_command nix
   nix "${NIX_FLAKE_FLAGS[@]}" eval --raw "$@"
@@ -54,6 +59,10 @@ set_local_nix_value() {
   local key="$2"
   local value="$3"
   local tmp
+  if [[ ! -f "${file}" ]]; then
+    echo "Missing file: ${file}" >&2
+    exit 2
+  fi
   tmp="$(mktemp)"
 
   awk -v k="${key}" -v v="${value}" '
@@ -196,6 +205,8 @@ load_target_from_inventory() {
 ensure_mountpoint() {
   local path="$1"
   local label="$2"
+  require_command mount
+  require_command mountpoint
 
   if mountpoint -q "${path}"; then
     return 0

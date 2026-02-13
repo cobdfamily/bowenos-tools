@@ -12,8 +12,15 @@ if [[ ! -d "${DEST_DIR}" ]]; then
 fi
 
 require_command nixos-generate-config
-${RM} -rf /tmp/hardware
-${MKDIR} -p /tmp/hardware
-nixos-generate-config --root /tmp/hardware
-${CP} /tmp/hardware/etc/nixos/hardware-configuration.nix "${DEST_DIR}/hardware-configuration.nix"
+require_command sync
+tmp_root="/tmp/hardware"
+cleanup() {
+  ${RM} -rf "${tmp_root}"
+}
+trap cleanup EXIT
+${RM} -rf "${tmp_root}"
+${MKDIR} -p "${tmp_root}"
+nixos-generate-config --root "${tmp_root}"
+${CP} "${tmp_root}/etc/nixos/hardware-configuration.nix" "${DEST_DIR}/hardware-configuration.nix"
+sync
 echo "Wrote ${DEST_DIR}/hardware-configuration.nix"

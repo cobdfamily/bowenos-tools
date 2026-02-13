@@ -8,13 +8,18 @@ source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 if [[ -f /etc/bowenos/flake.nix ]]; then
   require_command nix
   require_command nixos-rebuild
+  require_command cat
   if [[ ! -f /etc/hostname ]]; then
     echo "Missing /etc/hostname; cannot determine current host for update." >&2
     exit 2
   fi
-  HOST="$(cat /etc/hostname)"
+  HOST="$(cat /etc/hostname | tr -d '[:space:]')"
   if [[ -z "${HOST}" ]]; then
     echo "Empty /etc/hostname; cannot determine current host for update." >&2
+    exit 2
+  fi
+  if [[ ! "${HOST}" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+    echo "Invalid hostname '${HOST}' in /etc/hostname." >&2
     exit 2
   fi
   load_target_from_inventory "/etc/bowenos" "${HOST}"

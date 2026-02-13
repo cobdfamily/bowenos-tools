@@ -8,9 +8,14 @@ source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 if [[ -f /tmp/bowenos/flake.nix ]]; then
   require_command nix
   require_command nixos-install
+  require_command mountpoint
   select_host_from_inventory "/tmp/bowenos"
   # Validate host target early for clearer inventory errors.
   load_target_from_inventory "/tmp/bowenos" "${HOST}"
+  if [[ ! -d /mnt ]]; then
+    echo "/mnt does not exist. Ensure target filesystems are mounted before install." >&2
+    exit 2
+  fi
   if ! mountpoint -q /mnt/persist; then
     echo "/mnt/persist is not mounted. Refusing to copy inventory into the live environment." >&2
     exit 2

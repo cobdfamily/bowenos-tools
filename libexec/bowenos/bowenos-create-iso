@@ -6,4 +6,5 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 
 require_command nix
+echo "Building BowenOS Installer and Recovery ISO from github:cobdfamily/bowenos-tools#iso..."
 nix "${NIX_FLAKE_FLAGS[@]}" build --refresh "github:cobdfamily/bowenos-tools#iso"

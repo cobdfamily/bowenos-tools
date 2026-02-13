@@ -13,7 +13,7 @@ Commands:
   hardware-scan [DIR]  Generate hardware-configuration.nix in CWD or DIR
 
 Notes:
-  setup clones from bowenos-inventory-template.
+  setup clones a fresh shallow inventory from bowenos-inventory-template.
   setup validates hostname characters, hostId format, and SSH key prefix.
   target in host local.nix must be one of: compute, computeplusstorage, storage.
   mirror disk mode requires at least two distinct disks.

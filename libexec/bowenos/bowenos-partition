@@ -40,7 +40,7 @@ if [[ "${DISK_MODE:-mirror}" == "mirror" && -z "${BOOTB_BYID:-}" ]]; then
   exit 2
 fi
 PARTITION_ROOT="/tmp/bowenos-partitioning"
-PARTITION_REPO="https://github.com/cobdfamily/bowenos"
+PARTITION_REPO="${BOWENOS_PARTITION_REPO:-https://github.com/cobdfamily/bowenos}"
 if [[ "${FORCE:-0}" != "1" ]]; then
   echo "⚠️  About to WIPE and repartition:"
   echo "    TARGET=${TARGET}"
@@ -58,7 +58,7 @@ else
   echo "FORCE=1 set; skipping confirmation prompt."
 fi
 ${RM} -rf "${PARTITION_ROOT}"
-if ! git clone --depth 1 "${PARTITION_REPO}" "${PARTITION_ROOT}"; then
+if ! git clone --depth 1 --single-branch "${PARTITION_REPO}" "${PARTITION_ROOT}"; then
   echo "Failed to fetch bowenos partition sources from GitHub." >&2
   exit 2
 fi
@@ -69,7 +69,7 @@ if [[ ! -f "${DISK_PATH}" ]]; then
   exit 2
 fi
 echo "Partitioning with Disko..."
-nix --extra-experimental-features "nix-command flakes" run --impure \
+nix_run --impure \
   --refresh \
   github:nix-community/disko -- \
   --mode disko "${DISK_PATH}"

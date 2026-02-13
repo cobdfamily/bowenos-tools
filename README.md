@@ -12,6 +12,12 @@ If you do not have `bowenos` installed locally, run it with Nix:
 nix run github:cobdfamily/bowenos-tools -- help
 ```
 
+Build the installer ISO directly from GitHub:
+
+```bash
+nix run github:cobdfamily/bowenos-tools -- create-iso
+```
+
 Install the CLI into your profile:
 
 ```bash
