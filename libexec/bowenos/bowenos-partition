@@ -27,17 +27,6 @@ if [[ -n "${HOST}" ]]; then
   BOOTB_BYID="$(nix eval --raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootbById")"
   DISK_MODE="$(nix eval --raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.diskMode")"
   BOOT_MODE="$(nix eval --raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.bootMode")"
-  PARTITION_ROOT="/tmp/bowenos-partitioning"
-  PARTITION_REPO="https://github.com/cobdfamily/bowenos"
-
-  ${RM} -rf "${PARTITION_ROOT}"
-  git clone --depth 1 "${PARTITION_REPO}" "${PARTITION_ROOT}"
-
-  DISK_PATH="${PARTITION_ROOT}/targets/${TARGET}/disks.nix"
-  if [[ ! -f "${DISK_PATH}" ]]; then
-    echo "Could not find disk file for target '${TARGET}': ${DISK_PATH}" >&2
-    exit 2
-  fi
 fi
 export BOOTA_BYID BOOTB_BYID DISK_MODE BOOT_MODE
 if [[ -z "${BOOTA_BYID:-}" ]]; then
@@ -46,6 +35,17 @@ if [[ -z "${BOOTA_BYID:-}" ]]; then
 fi
 if [[ "${DISK_MODE:-mirror}" == "mirror" && -z "${BOOTB_BYID:-}" ]]; then
   echo "Set bootbById in hosts/${HOST}/local.nix for mirror mode." >&2
+  exit 2
+fi
+PARTITION_ROOT="/tmp/bowenos-partitioning"
+PARTITION_REPO="https://github.com/cobdfamily/bowenos"
+
+${RM} -rf "${PARTITION_ROOT}"
+git clone --depth 1 "${PARTITION_REPO}" "${PARTITION_ROOT}"
+
+DISK_PATH="${PARTITION_ROOT}/targets/${TARGET}/disks.nix"
+if [[ ! -f "${DISK_PATH}" ]]; then
+  echo "Could not find disk file for target '${TARGET}': ${DISK_PATH}" >&2
   exit 2
 fi
 if [[ "${FORCE:-0}" != "1" ]]; then
