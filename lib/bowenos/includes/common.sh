@@ -134,10 +134,6 @@ select_host_from_inventory() {
   fi
 }
 
-select_host_if_needed() {
-  select_host_from_inventory "/tmp/bowenos"
-}
-
 validate_target() {
   local target="$1"
   local host="${2:-${HOST:-unknown}}"
