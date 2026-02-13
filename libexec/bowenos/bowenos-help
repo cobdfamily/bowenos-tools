@@ -8,7 +8,7 @@ Commands:
   create-iso   Build the bootstrap ISO
   setup        Create /tmp/bowenos inventory from template for a new host
   partition    Partition + create mirrored rpool (destructive)
-  install      Run nixos-install for host in inventory
+  install      Install NixOS for host in inventory (writes system state)
   update       Run nixos-rebuild switch for current host
   hardware-scan [DIR]  Generate hardware-configuration.nix in CWD or DIR
 USAGE
