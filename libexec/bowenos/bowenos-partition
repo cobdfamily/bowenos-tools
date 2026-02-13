@@ -77,10 +77,10 @@ nix_run --impure \
 echo
 echo "Post-partition validation:"
 if [[ "${TARGET}" == "spine" ]]; then
-  if [[ -e /dev/disk/by-partlabel/disk-bootA-persist ]]; then
-    blkid /dev/disk/by-partlabel/disk-bootA-persist || true
+  if [[ -e /dev/disk/by-partlabel/disk-persist-persist ]]; then
+    blkid /dev/disk/by-partlabel/disk-persist-persist || true
   else
-    echo "  Persist partition label not found: /dev/disk/by-partlabel/disk-bootA-persist"
+    echo "  Persist partition label not found: /dev/disk/by-partlabel/disk-persist-persist"
   fi
 else
   if command -v zpool >/dev/null 2>&1; then
