@@ -86,9 +86,6 @@ else
 fi
 
 # Hardware scan
-${RM} -rf /tmp/hardware
-${MKDIR} -p /tmp/hardware
-nixos-generate-config --root /tmp/hardware
-${CP} /tmp/hardware/etc/nixos/hardware-configuration.nix "/tmp/bowenos/hosts/${HOSTNAME}/hardware-configuration.nix"
+"${SCRIPT_DIR}/bowenos-hardware-scan" "/tmp/bowenos/hosts/${HOSTNAME}"
 
 echo "Inventory written to /tmp/bowenos/hosts/${HOSTNAME}"

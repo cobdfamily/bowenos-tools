@@ -10,5 +10,5 @@ Commands:
   partition    Partition + create mirrored rpool (destructive)
   install      Run nixos-install for TARGET
   update       Run nixos-rebuild switch for TARGET
-  hardware-scan  Generate hardware-configuration.nix into repo
+  hardware-scan  Generate hardware-configuration.nix in CWD or given dir
 USAGE

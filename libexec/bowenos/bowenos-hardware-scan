@@ -5,14 +5,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=../../lib/bowenos/includes/common.sh
 source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 
+DEST_DIR="${1:-.}"
+if [[ ! -d "${DEST_DIR}" ]]; then
+  echo "Destination directory does not exist: ${DEST_DIR}" >&2
+  exit 2
+fi
+
 ${RM} -rf /tmp/hardware
 ${MKDIR} -p /tmp/hardware
 nixos-generate-config --root /tmp/hardware
-if [[ -n "${HOST}" ]]; then
-  ${MKDIR} -p "${INVENTORY_ROOT}/hosts/${HOST}"
-  ${CP} /tmp/hardware/etc/nixos/hardware-configuration.nix "${INVENTORY_ROOT}/hosts/${HOST}/hardware-configuration.nix"
-  echo "Wrote ${INVENTORY_ROOT}/hosts/${HOST}/hardware-configuration.nix"
-else
-  ${CP} /tmp/hardware/etc/nixos/hardware-configuration.nix "${ROOT}/hardware-configuration.nix"
-  echo "Wrote ${ROOT}/hardware-configuration.nix"
-fi
+${CP} /tmp/hardware/etc/nixos/hardware-configuration.nix "${DEST_DIR}/hardware-configuration.nix"
+echo "Wrote ${DEST_DIR}/hardware-configuration.nix"
