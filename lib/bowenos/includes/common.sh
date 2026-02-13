@@ -2,7 +2,6 @@
 set -euo pipefail
 
 HOST="${HOST:-}"
-TARGET="${TARGET:-computeplusstorage}"
 
 COREUTILS_ROOT="$(nix eval --raw --impure 'with import <nixpkgs> {}; pkgs.coreutils' 2>/dev/null || true)"
 if [[ -n "${COREUTILS_ROOT}" ]]; then
