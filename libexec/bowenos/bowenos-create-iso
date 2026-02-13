@@ -5,4 +5,5 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=../../lib/bowenos/includes/common.sh
 source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 
-nix build "${ROOT}#iso"
+TOOLS_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+nix build "${TOOLS_ROOT}#iso"
