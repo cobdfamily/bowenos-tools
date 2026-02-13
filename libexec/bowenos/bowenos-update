@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 
 if [[ -f /etc/bowenos/flake.nix ]]; then
+  require_command nix
   require_command nixos-rebuild
   if [[ ! -f /etc/hostname ]]; then
     echo "Missing /etc/hostname; cannot determine current host for update." >&2

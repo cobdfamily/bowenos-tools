@@ -24,10 +24,10 @@ if [[ -z "${HOST}" ]]; then
   exit 2
 fi
 load_target_from_inventory "${INVENTORY_ROOT}" "${HOST}"
-BOOTA_BYID="$(nix eval --raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootaById")"
-BOOTB_BYID="$(nix eval --raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootbById")"
-DISK_MODE="$(nix eval --raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.diskMode")"
-BOOT_MODE="$(nix eval --raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.bootMode")"
+BOOTA_BYID="$(nix_eval_raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootaById")"
+BOOTB_BYID="$(nix_eval_raw "path:${INVENTORY_ROOT}#hosts.${HOST}.bootbById")"
+DISK_MODE="$(nix_eval_raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.diskMode")"
+BOOT_MODE="$(nix_eval_raw "path:${INVENTORY_ROOT}#hostInfo.${HOST}.bootMode")"
 validate_disk_mode "${DISK_MODE}" "hosts/${HOST}/local.nix"
 validate_boot_mode "${BOOT_MODE}" "hosts/${HOST}/local.nix"
 export BOOTA_BYID BOOTB_BYID DISK_MODE BOOT_MODE

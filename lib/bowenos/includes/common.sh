@@ -2,6 +2,7 @@
 set -euo pipefail
 
 HOST="${HOST:-}"
+NIX_FLAKE_FLAGS=(--extra-experimental-features "nix-command flakes")
 
 require_command() {
   local cmd="$1"
@@ -9,6 +10,11 @@ require_command() {
     echo "Required command not found: ${cmd}" >&2
     exit 2
   fi
+}
+
+nix_eval_raw() {
+  require_command nix
+  nix "${NIX_FLAKE_FLAGS[@]}" eval --raw "$@"
 }
 
 validate_disk_mode() {
@@ -29,7 +35,7 @@ validate_boot_mode() {
   fi
 }
 
-COREUTILS_ROOT="$(nix eval --raw --impure 'with import <nixpkgs> {}; pkgs.coreutils' 2>/dev/null || true)"
+COREUTILS_ROOT="$(nix_eval_raw --impure 'with import <nixpkgs> {}; pkgs.coreutils' 2>/dev/null || true)"
 if [[ -n "${COREUTILS_ROOT}" ]]; then
   COREUTILS_BIN="${COREUTILS_ROOT}/bin"
   MKDIR="${COREUTILS_BIN}/mkdir"
@@ -183,7 +189,7 @@ load_target_from_inventory() {
     exit 2
   fi
 
-  TARGET="$(nix eval --raw "path:${inventory_root}#hostInfo.${host}.target")"
+  TARGET="$(nix_eval_raw "path:${inventory_root}#hostInfo.${host}.target")"
   validate_target "${TARGET}" "${host}" "hosts/${host}/local.nix"
 }
 
