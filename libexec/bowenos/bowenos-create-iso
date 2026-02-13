@@ -5,6 +5,5 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=../../lib/bowenos/includes/common.sh
 source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 
-TOOLS_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 require_command nix
-nix "${NIX_FLAKE_FLAGS[@]}" build --refresh "${TOOLS_ROOT}#iso"
+nix "${NIX_FLAKE_FLAGS[@]}" build --refresh "github:cobdfamily/bowenos-tools#iso"
