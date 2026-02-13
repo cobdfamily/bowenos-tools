@@ -14,6 +14,7 @@ Commands:
 
 Notes:
   setup clones from bowenos-inventory-template.
+  target must be one of: compute, computeplusstorage, storage.
   install requires /mnt/persist to be mounted; run partition first.
   update may mount boot ESPs before rebuild.
 USAGE
