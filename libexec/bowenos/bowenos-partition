@@ -63,6 +63,7 @@ if [[ ! -f "${DISK_PATH}" ]]; then
 fi
 echo "Partitioning with Disko..."
 nix --extra-experimental-features "nix-command flakes" run --impure \
+  --refresh \
   github:nix-community/disko -- \
   --mode disko ${DISK_PATH}
 
