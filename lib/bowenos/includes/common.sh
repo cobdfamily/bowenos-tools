@@ -3,6 +3,14 @@ set -euo pipefail
 
 HOST="${HOST:-}"
 
+require_command() {
+  local cmd="$1"
+  if ! command -v "${cmd}" >/dev/null 2>&1; then
+    echo "Required command not found: ${cmd}" >&2
+    exit 2
+  fi
+}
+
 COREUTILS_ROOT="$(nix eval --raw --impure 'with import <nixpkgs> {}; pkgs.coreutils' 2>/dev/null || true)"
 if [[ -n "${COREUTILS_ROOT}" ]]; then
   COREUTILS_BIN="${COREUTILS_ROOT}/bin"

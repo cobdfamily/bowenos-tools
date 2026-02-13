@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 
 if [[ -f /tmp/bowenos/flake.nix ]]; then
+  require_command nixos-install
   select_host_from_inventory "/tmp/bowenos"
   # Validate host target early for clearer inventory errors.
   load_target_from_inventory "/tmp/bowenos" "${HOST}"

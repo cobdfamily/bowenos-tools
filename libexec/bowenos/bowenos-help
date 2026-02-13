@@ -7,7 +7,7 @@ Usage: bowenos <command>
 Commands:
   create-iso   Build bootstrap ISO
   setup        Create /tmp/bowenos inventory
-  partition    Apply target disk layout with disko (destructive)
+  partition    Apply target disk layout with Disko (destructive)
   install      Install NixOS for selected inventory host
   update       Switch system for current host
   hardware-scan [DIR]  Generate hardware-configuration.nix in CWD or DIR

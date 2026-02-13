@@ -11,6 +11,7 @@ if [[ ! -d "${DEST_DIR}" ]]; then
   exit 2
 fi
 
+require_command nixos-generate-config
 ${RM} -rf /tmp/hardware
 ${MKDIR} -p /tmp/hardware
 nixos-generate-config --root /tmp/hardware

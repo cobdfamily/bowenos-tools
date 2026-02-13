@@ -6,12 +6,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bowenos/includes/common.sh"
 
 INVENTORY_ROOT="/tmp/bowenos"
+require_command git
+require_command nix
 if [[ ! -d "${INVENTORY_ROOT}" ]]; then
   echo "Missing ${INVENTORY_ROOT}. Run bowenos setup first." >&2
   exit 2
 fi
 if [[ ! -d "${INVENTORY_ROOT}/hosts" ]]; then
-  echo "Missing ${INVENTORY_ROOT}/hosts." >&2
+  echo "Missing ${INVENTORY_ROOT}/hosts. Run bowenos setup first." >&2
   exit 2
 fi
 
@@ -39,6 +41,7 @@ PARTITION_ROOT="/tmp/bowenos-partitioning"
 PARTITION_REPO="https://github.com/cobdfamily/bowenos"
 if [[ "${FORCE:-0}" != "1" ]]; then
   echo "⚠️  About to WIPE and repartition:"
+  echo "    TARGET=${TARGET}"
   echo "    DISK_MODE=${DISK_MODE}"
   echo "    BOOTA_BYID=${BOOTA_BYID}"
   if [[ "${DISK_MODE}" == "mirror" ]]; then
@@ -49,6 +52,8 @@ if [[ "${FORCE:-0}" != "1" ]]; then
     [yY]|[yY][eE][sS]) ;;
     *) echo "Aborted."; exit 1 ;;
   esac
+else
+  echo "FORCE=1 set; skipping confirmation prompt."
 fi
 ${RM} -rf "${PARTITION_ROOT}"
 if ! git clone --depth 1 "${PARTITION_REPO}" "${PARTITION_ROOT}"; then
@@ -65,7 +70,7 @@ echo "Partitioning with Disko..."
 nix --extra-experimental-features "nix-command flakes" run --impure \
   --refresh \
   github:nix-community/disko -- \
-  --mode disko ${DISK_PATH}
+  --mode disko "${DISK_PATH}"
 
 echo
 echo "Post-partition validation:"
