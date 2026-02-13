@@ -40,8 +40,12 @@ if [[ -n "${HOST}" ]]; then
   fi
 fi
 export BOOTA_BYID BOOTB_BYID DISK_MODE BOOT_MODE
-if [[ -z "${BOOTA_BYID:-}" || -z "${BOOTB_BYID:-}" ]]; then
-  echo "Set bootaById/bootbById in hosts/${HOST}/local.nix." >&2
+if [[ -z "${BOOTA_BYID:-}" ]]; then
+  echo "Set bootaById in hosts/${HOST}/local.nix." >&2
+  exit 2
+fi
+if [[ "${DISK_MODE:-mirror}" == "mirror" && -z "${BOOTB_BYID:-}" ]]; then
+  echo "Set bootbById in hosts/${HOST}/local.nix for mirror mode." >&2
   exit 2
 fi
 if [[ "${FORCE:-0}" != "1" ]]; then
