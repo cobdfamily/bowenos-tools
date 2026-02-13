@@ -6,9 +6,14 @@ Usage: bowenos <command>
 
 Commands:
   create-iso   Build bootstrap ISO
-  setup        Create /tmp/bowenos from inventory template
+  setup        Create /tmp/bowenos inventory
   partition    Apply target disk layout with disko (destructive)
-  install      Install NixOS for selected inventory host (/mnt/persist required; run partition first)
-  update       Switch system for current host (may mount boot ESPs)
+  install      Install NixOS for selected inventory host
+  update       Switch system for current host
   hardware-scan [DIR]  Generate hardware-configuration.nix in CWD or DIR
+
+Notes:
+  setup clones from bowenos-inventory-template.
+  install requires /mnt/persist to be mounted; run partition first.
+  update may mount boot ESPs before rebuild.
 USAGE
