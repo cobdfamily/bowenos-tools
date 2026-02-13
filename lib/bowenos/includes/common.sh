@@ -1,8 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd)"
-INVENTORY_ROOT="${ROOT}/flakes/inventory"
+if [[ -d /tmp/bowenos-partitioning ]]; then
+  ROOT="/tmp/bowenos-partitioning"
+elif [[ -d /etc/bowenos ]]; then
+  ROOT="/etc/bowenos"
+else
+  ROOT="/etc/bowenos"
+fi
+
+if [[ -f /etc/bowenos/flake.nix ]]; then
+  INVENTORY_ROOT="/etc/bowenos"
+elif [[ -d /tmp/bowenos ]]; then
+  INVENTORY_ROOT="/tmp/bowenos"
+else
+  INVENTORY_ROOT="/etc/bowenos"
+fi
 HOST="${HOST:-}"
 TARGET="${TARGET:-computeplusstorage}"
 
