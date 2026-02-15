@@ -22,7 +22,7 @@ if [[ -f /tmp/bowenos/flake.nix ]]; then
   fi
   ${MKDIR} -p /mnt/persist/etc/bowenos
   ${CP} -a /tmp/bowenos/. /mnt/persist/etc/bowenos/
-  nixos-install --refresh --impure --flake "path:/tmp/bowenos#${HOST}"
+  nixos-install --impure --flake "path:/tmp/bowenos#${HOST}"
 else
   echo "Missing /tmp/bowenos/flake.nix. Run bowenos setup first." >&2
   exit 2
