@@ -55,6 +55,7 @@ read -r -p "Disk mode (mirror/single/persistant) [mirror]: " DISK_MODE
 DISK_MODE="${DISK_MODE:-mirror}"
 validate_disk_mode "${DISK_MODE}" "hosts/${HOSTNAME}/local.nix"
 set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "diskMode" "\"${DISK_MODE}\""
+set_local_nix_value "${INVENTORY_ROOT}/hosts/${HOSTNAME}/local.nix" "hostName" "\"${HOSTNAME}\""
 
 # Target
 read -r -p "Target (compute/computeplusstorage/storage/spine) [computeplusstorage]: " TARGET
