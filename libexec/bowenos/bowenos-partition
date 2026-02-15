@@ -35,8 +35,8 @@ if [[ -z "${BOOTA_BYID:-}" ]]; then
   echo "Set bootaById in hosts/${HOST}/local.nix." >&2
   exit 2
 fi
-if [[ "${DISK_MODE:-mirror}" == "mirror" && -z "${BOOTB_BYID:-}" ]]; then
-  echo "Set bootbById in hosts/${HOST}/local.nix for mirror mode." >&2
+if [[ ( "${DISK_MODE:-mirror}" == "mirror" || "${DISK_MODE:-mirror}" == "persistant" ) && -z "${BOOTB_BYID:-}" ]]; then
+  echo "Set bootbById in hosts/${HOST}/local.nix for ${DISK_MODE} mode." >&2
   exit 2
 fi
 PARTITION_ROOT="/tmp/bowenos-partitioning"
@@ -46,7 +46,7 @@ if [[ "${FORCE:-0}" != "1" ]]; then
   echo "    TARGET=${TARGET}"
   echo "    DISK_MODE=${DISK_MODE}"
   echo "    BOOTA_BYID=${BOOTA_BYID}"
-  if [[ "${DISK_MODE}" == "mirror" ]]; then
+  if [[ "${DISK_MODE}" == "mirror" || "${DISK_MODE}" == "persistant" ]]; then
     echo "    BOOTB_BYID=${BOOTB_BYID}"
   fi
   read -r -p "Continue? (y/N) " ans

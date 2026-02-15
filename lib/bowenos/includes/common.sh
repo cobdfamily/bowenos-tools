@@ -25,8 +25,8 @@ nix_eval_raw() {
 validate_disk_mode() {
   local mode="$1"
   local source="${2:-inventory}"
-  if [[ "${mode}" != "mirror" && "${mode}" != "single" ]]; then
-    echo "Invalid disk mode '${mode}' in ${source}. Expected: mirror or single." >&2
+  if [[ "${mode}" != "mirror" && "${mode}" != "single" && "${mode}" != "persistant" ]]; then
+    echo "Invalid disk mode '${mode}' in ${source}. Expected: mirror, single, or persistant." >&2
     exit 2
   fi
 }
