@@ -49,14 +49,7 @@
           services.getty.autologinUser = lib.mkDefault "root";
 
           # Networking + SSH
-          # Bring up DHCP on every interface in the live ISO.
-          networking.useNetworkd = lib.mkForce true;
-          systemd.network.enable = true;
-          systemd.network.networks."10-all-dhcp" = {
-            matchConfig.Name = "*";
-            networkConfig.DHCP = "yes";
-          };
-          networking.useDHCP = lib.mkForce true;
+          networking.useDHCP = lib.mkDefault true;
           services.openssh = {
             enable = true;
             settings = {
