@@ -6,3 +6,4 @@ result*
 *.swp
 *.swo
 *~
+.env
