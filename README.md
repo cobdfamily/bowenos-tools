@@ -1,5 +1,7 @@
 # bowenos-tools
 
+A set of tools for managing the Bowen OS lifecycle.
+
 Run the tool help for command usage:
 
 ```bash
